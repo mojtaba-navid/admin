@@ -1,0 +1,15 @@
+export { default as CreateProduct } from "./create-product";
+export { default as Home } from "./home";
+export { default as Login } from "./login";
+export { default as Register } from "./register";
+export { default as Brand } from "./brand";
+export { default as Property } from "./product-type";
+export { default as Navid } from "./navid";
+// export { Register } from "./Register";
+// export { EditProfile } from "./EditProfile";
+// export { Orders } from "./Orders";
+// export { CreateProductCat } from "./CreateProductCat";
+// export { ProductTypes } from "./ProductTypes";
+// export { Brand } from "./Brand";
+// export { Filter } from "./Filter";
+// export { Property } from "./Property";
