@@ -10,7 +10,22 @@ export interface BaseResponse<T> {
 
 export interface BaseResponsePagination<T> {
   message: string;
-  data: { data: T };
+  data: {
+    data: T;
+    meta: {
+      page: number;
+      take: number;
+      itemCount: number;
+      pageCount: number;
+      hasPreviousPage: boolean;
+      hasNextPage: boolean;
+    };
+  };
+}
+
+export interface BaseResponsePagination2<T> {
+  message: string;
+  data: T;
   meta: {
     page: number;
     take: number;

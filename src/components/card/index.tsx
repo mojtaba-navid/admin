@@ -1,6 +1,5 @@
 import { Avatar } from '@mui/material';
-import { ReactNode, useRef } from 'react'
-import style from './card.css'
+import { ReactNode } from 'react'
 interface PropsType {
     showHeader?: boolean,
     headerTitle?: string,
@@ -30,7 +29,7 @@ export default function Card(props: PropsType) {
         fileUpload = false,
     } = props
 
-    const fileInputRef = useRef();
+    // const fileInputRef = useRef();
     const handleClickInputFile = () => {
         // fileInputRef.current
     };

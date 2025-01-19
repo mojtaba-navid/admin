@@ -1,18 +1,19 @@
-import React, { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode"; // Correct import
 import { PATHS } from "../../config/routes.config";
 import AppLayout from "../../layout";
 
 interface PropsType {
-  component: React.ComponentType; // Updated type for component
-  layout: ReactNode;
+  component: ReactNode
+  layout: {
+    type: "private" | "auth"
+  }
   ifIsLoginGoBack: boolean;
 }
 
-const Public = ({ component: Component, layout, ifIsLoginGoBack }: PropsType) => {
+const Public = ({ component, layout, ifIsLoginGoBack }: PropsType) => {
   const navigate = useNavigate();
-  console.log(layout)
   useEffect(() => {
     const user = localStorage.getItem("user") || "{}";
     const token = JSON.parse(user)?.token;
@@ -24,7 +25,7 @@ const Public = ({ component: Component, layout, ifIsLoginGoBack }: PropsType) =>
   return (
     <>
       <AppLayout layoutItems={layout}>
-        <Component />
+        {component}
       </AppLayout>
     </>
   );

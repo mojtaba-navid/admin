@@ -1,452 +1,297 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Button, DataGrid, Form, Modal, TextFiled } from '../../components'
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import Select from '../../components/select';
-import { BORD, BRAND, CATERGORY, DELIVERY_METHOD, EXIST, LENZ, MODEL, NUMBER_OF_EXIST, OFF, PHOTO, PRICE_FOR_USER, PRICE_FOR_WORKMATE, TYPE, WARRANTY } from './create-product.config';
-import { Brand } from '../../types/brand.type';
-import { Catergory } from '../../types/catergory.type';
-import { z } from 'zod';
-import { optionsType } from '../../types/client/general';
-import { useQuery } from '@tanstack/react-query';
-import { getCatergoris } from './create-product.api';
+// AddProductForm.tsx
+import React, { useEffect, useState } from "react";
+import { useForm, useFieldArray } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { addProduct, AddProductData, deleteProduct, getProducts, uploadFile } from "./create-product.api";
+import {
+    OFF, MODEL, NUMBER_OF_EXIST, PHOTO,
+    PRICE_FOR_USER, PRICE_FOR_WORKMATE, WARRANTY, BRAND, TYPE, CATERGORY,
+    defaultValues
+} from "./create-product.config";
+import { Button, TextFiled, Select, ImageUploader, Form, Card, Modal } from "../../components";
+import AddCollapse from "../../components/add-collapse";
+import { productSchema } from "./product.schema";
+import { getCatergories } from "../category/category.api";
+import { BaseResponse } from "../../types/client/general";
+import { Product } from "../../types/product.type";
+import CustomDataGrid from "../../components/dataGrid";
+import { GridColDef } from "@mui/x-data-grid";
+import { Icon } from '@iconify/react'
+import Edit from "./edit";
+import { ProductPhoto } from "../../types/productPhoto.type";
+import { PropertyTitle } from "../../types/propertyTitle.type";
+import toast from "react-hot-toast";
 
-export default function CreateProduct() {
-    const { data, status, error } = useQuery({
-        queryKey: ["categories"],  // The query key is now inside queryKey
-        queryFn: getCatergoris,    // The function to fetch the data is now queryFn
+
+
+const AddProductForm: React.FC = () => {
+    const [openEditModal, setOpenEditModal] = useState<boolean>(false)
+    const [rows, setRows] = useState<Array<Product>>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPageCount, setTotalPageCount] = useState(1);
+    const [model, setModel] = useState<string>()
+    const [dataForm, setDataForm] = useState<AddProductData>();
+
+    const pageSize = 10;
+
+    const { data, isFetching, refetch } = useQuery({
+        queryKey: ["productTypes", currentPage],
+        queryFn: () => getProducts(currentPage, pageSize),
     });
 
-    const [showAddProductModal, setShowAddProductModal] = useState<boolean>(false)
-    const [brands, setBrands] = useState<Array<optionsType>>([]);
-    // const [brandForSend, setBrandForSend] = useState();
-    const [categories, setCategories] = useState<Array<optionsType>>([]);
-    // const [columns, setColumns] = useState([]);
-    // const [formInputs, setFormInputs] = useState([]);
-    // const [isLoading, setIsloading] = useState(false);
-    // const [isloadingSelect, setIsloadingSelect] = useState(false);
-    // const [rows, setRows] = useState([]);
-    // const [open, setOpen] = useState(false);
-    // const [openBackDrop, setOpenBackDrop] = useState(false);
-    // const [openConfirmModal, setOpenConfirmModal] = useState(false);
-    // const [openInputModal, setOpenInputModal] = useState(false);
-    // const [photo, setPhoto] = useState(null);
-    // const [productInfo, setProductInfo] = useState({});
-    // const [productTypes, setProductTypes] = useState({});
-    // const [typesForSend, setTypesForSend] = useState();
-    // const [catValue, setCatValue] = useState(null);
-    // const [brandsValue, setBrandsValue] = useState(null);
-    const [typesValue, setTypesValue] = useState<Array<optionsType>>([]);
-    // const [propertyInputArray, setPropertyInputArray] = useState();
-    // const [model, setModel] = useState(null);
-    // const fileInputRef = useRef();
+    useEffect(() => {
+        if (data) {
+            setRows(data.data || []);
+            setTotalPageCount(data.meta?.pageCount || 1);
 
-    // const [dataGrid, setDataGrid] = useState({
-    //     loading: true,
-    //     rows: [],
-    //     totalRows: 1,
-    //     pageSize: 10,
-    //     page: 1,
-    // });
+        }
+    }, [data]);
 
-    // useEffect(() => {
-    //     getAllProducts();
-    // }, [dataGrid.page]);
-
-    // useEffect(() => {
-    //     getCategories();
-    // }, []);
-
-    // const getCategories = async () => {
-    //     setIsloading(true);
-    //     setBrands([]);
-    //     setProductTypes([]);
-    //     try {
-    //         const { getCats } = props;
-    //         const result = await getCats();
-    //         const categories =
-    //             !isEmptyArray(result.data) &&
-    //             result.data.map((item) => {
-    //                 return { value: item.id, label: item.title };
-    //             });
-
-    //         setCategories(categories);
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setIsloading(false);
-    //     }
-    // };
-
-    // const handleClickInputFile = () => {
-    //     fileInputRef.current.click();
-    // };
-
-    // const handleSubmit = async (e) => {
-    //     try {
-    //         const empty = [];
-    //         let featrues = [];
-    //         setOpenBackDrop(true);
-    //         const { createProduct } = props;
-    //         setIsloading(true);
-    //         e.preventDefault();
-    //         const form = new FormData(e.target);
-    //         const data = Object.fromEntries(form);
-    //         for (let key in data) {
-    //             let searchKey = key.search("feature");
-    //             if (searchKey > -1) {
-    //                 featrues.push({ id: Number(data[key]) });
-    //                 delete data[key];
-    //             }
-    //         }
-    //         data.properties = featrues;
-    //         data.photo = photo;
-    //         data[BRAND] = brandForSend;
-    //         data[TYPE] = typesForSend;
-    //         const result = await createProduct(data);
-    //         if (result) {
-    //             getAllProducts();
-    //             e.target.reset();
-    //             setBrands([...empty]);
-    //             setProductTypes([...empty]);
-    //             setPhoto(null);
-    //             setPropertyInputArray([...empty]);
-    //             setBrandsValue([...empty]);
-    //             setTypesValue(null);
-    //             setCatValue(null);
-    //         }
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setOpenBackDrop(false);
-    //         setIsloading(false);
-    //     }
-    // };
-    // const getAllProducts = async () => {
-    //     const { getProducts } = props;
-
-    //     const columns = [
-    //         {
-    //             headerClassName: "super-app-theme--header",
-    //             field: "photo",
-    //             sortable: false,
-    //             headerName: "عکس",
-    //             filterable: false,
-    //             hideable: false,
-    //             renderCell: (params) => {
-    //                 if (params.row?.photo) {
-    //                     return (
-    //                         <img
-    //                             src={BASE_URL + params.row.photo}
-    //                             width={50}
-    //                             height={50}
-    //                             className="rouned"
-    //                             alt=""
-    //                         />
-    //                     );
-    //                 } else {
-    //                     return (
-    //                         <div className=" text-center text-gray-500    p-2  border  rounded-full bg-blue-100">
-    //                             <PersonOutlineIcon />
-    //                         </div>
-    //                     );
-    //                 }
-    //             },
-    //         },
-    //         { field: MODEL, headerName: "مدل", width: 150 },
-    //         {
-    //             field: "edit",
-    //             sortable: false,
-    //             headerName: "",
-    //             filterable: false,
-    //             hideable: false,
-    //             renderCell: (params) => {
-    //                 const onClick = (e) => {
-    //                     e.stopPropagation();
-
-    //                     edit(params.row);
-    //                 };
-    //                 return (
-    //                     <Button onClick={onClick}>
-    //                         <EditIcon />
-    //                         <div className="px-5"> ویرایش </div>
-    //                     </Button>
-    //                 );
-    //             },
-    //         },
-    //         {
-    //             field: "delete",
-    //             headerName: "",
-    //             sortable: false,
-    //             filterable: false,
-    //             renderCell: (params) => {
-    //                 const onClick = (e) => {
-    //                     e.stopPropagation();
-    //                     deleteItem(params.row);
-    //                 };
-    //                 return (
-    //                     <Button onClick={onClick} color="error">
-    //                         <DeleteIcon />
-    //                         <div> حذف</div>
-    //                     </Button>
-    //                 );
-    //             },
-    //         },
-    //     ];
-    //     try {
-    //         setOpenBackDrop(true);
-    //         const products = await getProducts({ page: dataGrid.page });
-    //         dataGrid.totalRows = products.meta.itemCount;
-    //         setDataGrid({ ...dataGrid });
-    //         const data = products.data.map((item) => {
-    //             return {
-    //                 id: item.id,
-    //                 [MODEL]: item.model,
-
-    //                 [PHOTO]: item.photo,
-    //             };
-    //         });
-
-    //         setRows(data);
-    //         setColumns(columns);
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setOpenBackDrop(false);
-    //     }
-    // };
-
-    // const edit = async (row) => {
-    //     setModel(row.model);
-    //     setOpen(true);
-    //     SetEditId(null);
-    //     SetEditId(row.id);
-    // };
-
-    // const deleteItem = (item) => {
-    //     setProductInfo(item);
-    //     setOpenConfirmModal(true);
-    // };
-
-    // const handleOpen = () => {
-    //     setOpen(true);
-    // };
-
-    // const handleCloseModal = () => {
-    //     SetEditId(null);
-    //     setOpen(false);
-    // };
-
-    // const handleEdit = async (data) => {
-    //     setOpenBackDrop(true);
-    //     const { editProduct } = props;
-    //     const mainData = {
-    //         ...data,
-    //     };
-    //     try {
-    //         await editProduct(mainData, model);
-    //         SetEditId(null);
-    //         getAllProducts();
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setOpen(false);
-    //         setOpenBackDrop(false);
-    //     }
-    // };
-    // const handleCloseConfirmModal = () => {
-    //     setOpenConfirmModal(false);
-    // };
-
-    // const handleDisagree = async () => {
-    //     setOpenBackDrop(true);
-    //     const { deleteProduct } = props;
-    //     try {
-    //         await deleteProduct(productInfo.model);
-    //         getAllProducts();
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setOpenBackDrop(false);
-    //         setOpenConfirmModal(false);
-    //     }
-    // };
-    // const handleChangeFile = async (file) => {
-    //     const { uploadProductImage } = props;
-    //     try {
-    //         if (file) {
-    //             setOpenBackDrop(true);
-    //             const formData = new FormData();
-    //             formData.append("photo", file);
-    //             const uploadedPhoto = await uploadProductImage(formData);
-    //             setPhoto(uploadedPhoto.data.src);
-    //         }
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setOpenBackDrop(false);
-    //     }
-    // };
-
-    // const handleCanclePhoto = () => {
-    //     setPhoto(null);
-    // };
-
-    // const handleOpenAddInputModal = () => {
-    //     setOpenInputModal(true);
-    // };
-    // const handleSubmitAddInput = (data) => {
-    //     formInputs.push(data);
-    //     setFormInputs(formInputs);
-    //     setOpenInputModal(false);
-    // };
-    // const handleCloseAddInput = () => {
-    //     setOpenInputModal(false);
-    // };
-
-    // const hanleChangeCategory = async (item) => {
-    //     let emtpy = [];
-    //     setCatValue(item);
-    //     setBrands([...emtpy]);
-    //     setProductTypes([...emtpy]);
-    //     const { getCat } = props;
-    //     try {
-    //         setIsloadingSelect(true);
-    //         const data = {
-    //             id: Number(item?.value),
-    //             brand: true,
-    //             productType: true,
-    //             propertyTitles: true,
-    //         };
-    //         const result = await getCat(data);
-    //         const brands = result.data.brands.map((item) => ({
-    //             value: item?.id,
-    //             label: item?.title,
-    //         }));
-    //         const productTypes = result.data.productTypes.map((item) => ({
-    //             value: item?.id,
-    //             label: item?.title,
-    //         }));
-    //         createInputs(result.data.propertyTitles);
-
-    //         setBrands(brands);
-    //         setProductTypes(productTypes);
-    //     } catch (error) {
-    //         console.log("error", error);
-    //     } finally {
-    //         setIsloadingSelect(false);
-    //     }
-    // };
-
-    // const createInputs = (items) => {
-    //     const inputs = !isEmptyArray(items)
-    //         ? items.map((item, index) => {
-    //             const selectItems =
-    //                 !isEmptyArray(item.properties) &&
-    //                 item.properties.map((data) => ({
-    //                     label: data?.property,
-    //                     value: data.id,
-    //                 }));
-    //             return {
-    //                 name: "feature_" + index,
-    //                 label: item.title,
-    //                 selectItems,
-    //             };
-    //         })
-    //         : [];
-
-    //     setPropertyInputArray(inputs);
-    // };
-
-    // const handleChangeBrand = (item) => {
-    //     setBrandsValue(item);
-    //     setBrandForSend({ id: item.value });
-    // };
-
-    // const handleChangeType = (item) => {
-    //     setTypesValue(item);
-    //     const types =
-    //         !isEmptyArray(item) &&
-    //         item.map((item) => {
-    //             return { id: item.value };
-    //         });
-    //     setTypesForSend(types);
-    // };
-    // const handlePageChange = (page) => {
-    //     dataGrid.page = page + 1;
-    //     setDataGrid({ ...dataGrid });
-    // };
-
-    const defaultValues = {
-        [MODEL]: '',
-        [BORD]: '',
-        [DELIVERY_METHOD]: '',
-        [OFF]: '',
-        [EXIST]: '',
-        [LENZ]: '',
-        [NUMBER_OF_EXIST]: '',
-        [PHOTO]: '',
-        [PRICE_FOR_USER]: '',
-        [PRICE_FOR_WORKMATE]: '',
-        [WARRANTY]: '',
-        [BRAND]: '',
-        [TYPE]: '',
-        [CATERGORY]: '',
-    }
-
-    const schema = z.object({
-        [MODEL]: z.string().min(1, { message: "مدل الزامی است" }),
-        [BORD]: z.string().min(1, { message: "بورد الزامی است" }),
-        [DELIVERY_METHOD]: z.string().min(1, { message: "روش ارسال الزامی است" }),
-        [OFF]: z.number().min(0, { message: "تخفیف نباید کمتر از 0 باشد" }).optional(),
-        [EXIST]: z.number().min(1, { message: "تعداد موجودی الزامی است" }),
-        [LENZ]: z.string().min(1, { message: "لنز الزامی است" }),
-        [NUMBER_OF_EXIST]: z.number().min(1, { message: "تعداد موجودی باید حداقل 1 باشد" }).optional(),
-        [PHOTO]: z.string().min(1, { message: "عکس الزامی است" }),
-        [PRICE_FOR_USER]: z.number().min(0, { message: "قیمت برای کاربر نباید کمتر از 0 باشد" }).optional(),
-        [PRICE_FOR_WORKMATE]: z.number().min(0, { message: "قیمت برای همکار نباید کمتر از 0 باشد" }).optional(),
-        [WARRANTY]: z.string().min(1, { message: "گارانتی الزامی است" }),
-        [BRAND]: z.string().min(1, { message: "برند الزامی است" }),
-        [TYPE]: z.array(z.string()).min(1, { message: "حداقل یک نوع باید انتخاب شود" }),
-        [CATERGORY]: z.string().min(1, { message: "دسته‌بندی الزامی است" }),
+    const { mutate: deleteMutate } = useMutation<
+        BaseResponse<void>,
+        Error,
+        { model: string }
+    >({
+        mutationFn: ({ model }: { model: string }) => deleteProduct(model || ""),
+        onSuccess: () => {
+            toast.success("ویرایش محصول با موفقیت انجام شد", {
+                position: "bottom-left",
+            });
+            refetch()
+            methods.reset();
+        },
+        onError: (error) => {
+            try {
+                const errorMessage = JSON.parse(error.message)?.message || "خطایی رخ داده است";
+                toast.error(errorMessage, {
+                    position: "bottom-left",
+                });
+            } catch {
+                toast.error("خطایی در سرور رخ داده است", {
+                    position: "bottom-left",
+                });
+            }
+        },
     });
 
-    const methods = useForm({
-        mode: 'all',
+    const columns: GridColDef[] = [
+        { field: "model", headerName: "مدل", width: 200 },
+        {
+            field: "actions",
+            headerName: "عملیات",
+            width: 150,
+            renderCell: (params) => {
+                return (
+                    <div className='  flex mt-2 gap-8'>
+                        <Icon icon="ic:baseline-delete" width="24" height="24" className=' text-red-500 mt-1 cursor-pointer' onClick={() => { console.log(params.row.model); deleteMutate(params.row.model) }} />
+                        <Icon icon="mage:edit" width="24" height="24" className='text-blue-600 mt-1 cursor-pointer' onClick={() => { setOpenEditModal(true); setModel(params.row.model) }} />
+                    </div >
+                );
+            },
+        },
+    ];
+    const [brands, setBrands] = useState<{ value: string; label: string }[]>([]);
+    const [prodcutTypes, setProdcutTypes] = useState<{ value: string; label: string }[]>([]);
+    const [properties, setProperties] = useState<
+        Array<PropertyTitle>
+    >([]);
+    const methods = useForm<AddProductData>({
+        resolver: zodResolver(productSchema),
         defaultValues,
-        resolver: zodResolver(schema),
     });
 
-    const { handleSubmit, formState: { isSubmitting, errors } } = methods;
-
-
-    const onSubmit = handleSubmit(async (data) => {
-        // mutate(data);
+    const { fields: propertyFields } = useFieldArray({
+        control: methods.control,
+        name: "properties",
     });
+
+
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+        refetch()
+    };
+
+    const { data: CategoriesData } = useQuery({
+        queryKey: ["categories"],
+        queryFn: () => getCatergories(1, 50),
+    });
+
+    const categories = CategoriesData?.data.data.map((item) => ({
+        value: item.id.toString(),
+        label: item.title,
+    })) || [];
+
+    const { handleSubmit, reset, watch, formState: { isSubmitting } } = methods;
+
+    const mutation = useMutation<BaseResponse<Product>, Error, AddProductData>({
+        mutationFn: addProduct,
+        onSuccess: () => {
+            toast.success("افزودن محصول با موفقیت انجام شد", {
+                position: "bottom-left",
+            });
+            reset();
+        },
+        onError: (error) => {
+            let errorMessage = "خطایی رخ داده است.";
+            try {
+                errorMessage = JSON.parse(error.message).message;
+            } catch {
+                // اگر پیام خطا JSON نباشد، از پیام پیش‌فرض استفاده شود
+            }
+            toast.error(errorMessage, {
+                position: "bottom-left",
+            });
+        },
+    });
+
+    const changeCategory = watch("category");
+    useEffect(() => {
+        if (changeCategory) {
+            const selectedCategory = CategoriesData?.data.data.find(
+                (item) => item.id.toString() === changeCategory
+            );
+
+            const optionBrands = selectedCategory?.brands.map((item) => ({
+                value: item.id.toString(),
+                label: item.title,
+            }));
+            const optionProdcutTypes = selectedCategory?.productTypes.map((item) => ({
+                value: item.id.toString(),
+                label: item.title,
+            }));
+            const categoryProperties = selectedCategory?.propertyTitles || [];
+
+            setBrands(optionBrands || []);
+            setProdcutTypes(optionProdcutTypes || []);
+            setProperties(categoryProperties || []);
+            methods.setValue(
+                "properties",
+                categoryProperties.map((propertyTitle) => ({
+                    id: propertyTitle.id.toString(),
+                    value: "",
+                }))
+            );
+        }
+    }, [changeCategory]);
+
+
+    const { mutate: UploadFilemutate } = useMutation<BaseResponse<ProductPhoto>, Error, string>({
+        mutationFn: uploadFile,
+        onSuccess: (data) => {
+            console.log(data)
+            // const sendData = {
+            //     ...dataForm,
+            //     photo: data.data.id
+            // }
+
+            const sendData = {
+
+                type: dataForm?.type || "",
+                model: dataForm?.model || "",
+                category: dataForm?.category || "",
+                brand: dataForm?.brand || "",
+                types: dataForm?.types || "",
+                priceForUser: dataForm?.priceForUser || "",
+                priceForWorkmate: dataForm?.priceForWorkmate || "",
+                warranty: dataForm?.warranty || "",
+                numberOfExist: dataForm?.numberOfExist || "",
+                off: dataForm?.off || "",
+                properties: dataForm?.properties || [],
+                photo: dataForm?.photo || "",
+            }
+            mutation.mutate(sendData)
+            toast.success("فایل با موفقیت اپلود شد", {
+                position: 'bottom-left',
+            });
+        },
+        onError: (error) => {
+            toast.error(JSON.parse(error.message).message, {
+                position: 'bottom-left',
+            });
+        },
+    });
+
+
+    const onSubmit = handleSubmit((data) => {
+        if (!data.photo)
+            mutation.mutate(data);
+        else {
+            setDataForm(data)
+            UploadFilemutate(data.photo)
+        }
+    });
+
     return (
         <>
-            {/* <DataGrid /> */}
-            <Button variant='contained' onClick={() => setShowAddProductModal(true)}>افزودن محصول</Button>
-            <Form methods={methods} onSubmit={onSubmit} >
-                <Modal open={showAddProductModal} title='ایجاد محصول' onClose={() => setShowAddProductModal(false)} onAgree={() => console.log('hello')}>
-                    <div className={` flex flex-col gap-6 w-full`}>
-                        <TextFiled name={MODEL} label="Model" />
-                        <Select name={CATERGORY} label="Category" options={categories} />
-                        <Select name={BRAND} label="Brand" options={brands} />
-                        <Select name={TYPE} label="Types" options={typesValue} />
-                        <TextFiled name={BORD} label="Bord" />
-                        <TextFiled name={DELIVERY_METHOD} label="Delivery Method" />
-                        <TextFiled name={OFF} label="Discount" type="number" />
-                        <TextFiled name={EXIST} label="Exist" />
-                        <TextFiled name={LENZ} label="Lenz" />
-                        <TextFiled name={NUMBER_OF_EXIST} label="Number of Exist" type="number" />
-                        <TextFiled name={PHOTO} label="Photo" />
-                        <TextFiled name={PRICE_FOR_USER} label="Price for User" type="number" />
-                        <TextFiled name={PRICE_FOR_WORKMATE} label="Price for Workmate" type="number" />
-                        <TextFiled name={WARRANTY} label="Warranty" />
-                    </div>
-                </Modal >
-            </Form>
+            <AddCollapse title="ایجاد محصول">
+                <Card showHeader={false}>
+                    <Form methods={methods} onSubmit={onSubmit}>
+                        <div className="flex flex-col gap-4">
+                            <TextFiled label="مدل" name={MODEL} type="text" />
+                            <div className=" z-40">
+                                <Select label="دسته‌بندی" name={CATERGORY} options={categories} />
+                                <Select label="برند" name={BRAND} options={brands} />
+                                <Select label="نوع" name={TYPE} options={prodcutTypes} />
+
+                                {propertyFields.map((field, index) => (
+                                    <div key={field.id} className="flex flex-col gap-2">
+                                        <Select
+                                            name={`properties.${index}.value`}
+                                            label={`انتخاب ${properties[index]?.title || ""}`}
+                                            options={properties[index]?.properties.map((prop) => ({
+                                                value: prop.id.toString(),
+                                                label: prop.property,
+                                            })) || []}
+                                        />
+                                    </div>
+                                ))}
+                            </div>
+                            <TextFiled label="قیمت برای کاربر" name={PRICE_FOR_USER} type="number" />
+                            <TextFiled label="قیمت برای همکار" name={PRICE_FOR_WORKMATE} type="number" />
+                            <TextFiled label="گارانتی" name={WARRANTY} type="text" />
+                            <TextFiled label="تعداد موجودی" name={NUMBER_OF_EXIST} type="number" />
+                            <TextFiled label="تخفیف" name={OFF} type="number" />
+
+                            <ImageUploader
+                                name={PHOTO}
+                                label="آپلود عکس"
+
+                                accept="image/*"
+                                maxSize={2 * 1024 * 1024} // ۲ مگابایت
+                            />
+                            <div className="flex justify-end">
+                                <Button type="submit" loading={isSubmitting}>
+                                    افزودن محصول
+                                </Button>
+                            </div>
+                        </div>
+                    </Form>
+                </Card>
+            </AddCollapse>
+
+            <Card showHeader={false} className="w-full h-5/6 mt-8">
+                <CustomDataGrid
+                    rows={rows}
+                    columns={columns}
+                    totalPageCount={totalPageCount}
+                    currentPage={currentPage}
+                    pageSize={pageSize}
+                    onPageChange={handlePageChange}
+                    loading={isFetching}
+                />
+            </Card>
+            <Modal show={openEditModal}
+                title={'ویرایش'}
+                onClose={() => setOpenEditModal(false)}
+                modalContent={<Edit CategoriesData={CategoriesData?.data.data || []} categories={categories} model={model || ''} onEdit={() => { setOpenEditModal(false); refetch() }} />} sheetContent={<Edit categories={categories} CategoriesData={CategoriesData?.data.data || []} model={model || ''} onEdit={() => { refetch(); setOpenEditModal(false) }} />}
+            />
+
+
         </>
-    )
-}
+    );
+};
+
+export default AddProductForm;
+
+

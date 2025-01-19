@@ -1,4 +1,6 @@
+import { Brand } from "./brand.type";
 import { Cart } from "./cart.type";
+import { Catergory } from "./catergory.type";
 import { Order } from "./order.type";
 import { ProductPhoto } from "./productPhoto.type";
 import { ProductType } from "./productType.type";
@@ -9,8 +11,8 @@ import { User } from "./user.type";
 export interface Product extends Share {
   author: User;
   baskets: Array<Cart>;
-  brand: string;
-  category: string;
+  brand: Brand;
+  category: Catergory;
   deliveryMethod: string;
   exist: boolean;
   model: string;

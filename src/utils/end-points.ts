@@ -5,26 +5,28 @@ export const endpoints = {
     logout: "auth/logout",
   },
   product: {
-    product: "/product",
-    getProduct: "/product/:id",
-    editProduct: "/product/:model",
-    uploadImage: "/product/upload-product-image",
+    product: "product",
+    getProduct: "product/bymodel/:model",
+    editProduct: "product/:model",
+    uploadImage: "product/upload-product-image",
+    getAvailable: "product/available/:model",
   },
 
   orders: {
-    orders: "/orders",
-    getOrder: "/orders/get-order/:id",
+    orders: "orders",
+    getOrder: "orders/get-order/:id",
     changeOrderStatus: "orders/change-order-status/:id",
     searchOrder: "orders/search-order-admin",
   },
 
   user: {
-    users: "/users",
-    uploadUserImage: "/user/upload-image",
-    getUserImage: "/user/user-image",
+    users: "users",
+    uploadUserImage: "user/upload-image",
+    getUserImage: "user/user-image",
   },
   type: {
     type: "type",
+    getProductType: "type/:id",
     addBrand: "type/add-brand",
     editBrand: "type/edit-brand/:id",
     deleteBrand: "type/delete-brand/:id",
@@ -33,8 +35,18 @@ export const endpoints = {
     addproperty: "type/add-property",
     getProperties: "type/get-properties",
   },
+  propertyTitle: {
+    propertyTitle: "properties",
+    propertyTitlewithParmas: "properties/:id",
+  },
+  property: {
+    properties: "properties",
+    propertiesWithParam: "properties/property/:id",
+  },
   category: {
-    getCatergoris: "category",
+    category: "category",
+    categorywithParam: "category/:id",
     getCatergory: "category/get-cat",
+    UploadPhoto: "category/upload-category-image",
   },
 };

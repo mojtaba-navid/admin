@@ -5,6 +5,8 @@ interface propsType {
     children: ReactNode,
     title: string
 }
+
+
 export default function AddCollapse(props: propsType) {
     const [CollapseStatus, setCollapseStatus] = useState<boolean>(true)
     return (

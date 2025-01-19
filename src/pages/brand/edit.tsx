@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Button, Form, ModalFooter, TextFiled } from "../../components";
 import { BRAND, TITLE } from "./barnd.config";
 import { z } from "zod";
@@ -7,9 +7,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { AddBrandData, editBrand, getBrand } from "./brand.api";
 import { Icon } from "@iconify/react";
-import { toast } from "react-toastify";
 import { BaseResponse } from "../../types/client/general";
 import { Brand } from "../../types/brand.type";
+import toast from "react-hot-toast";
 
 interface PropsType {
     id: number;
@@ -17,13 +17,13 @@ interface PropsType {
 }
 
 export default function Edit({ id, onEdit }: PropsType) {
-    const { data, isFetching, isError, refetch } = useQuery({
+    const { data, isFetching, isError } = useQuery({
         queryKey: ["brand", id],
         queryFn: () => getBrand(id),
     });
 
     const { mutate } = useMutation<BaseResponse<Brand>, Error, { id: number; data: AddBrandData }>({
-        mutationFn: ({ id, data }) => editBrand(id,data),
+        mutationFn: ({ id, data }) => editBrand(id, data),
         onSuccess: () => {
             toast.success("ویرایش برند با موفقیت انجام شد", {
                 position: "bottom-left",
@@ -93,6 +93,8 @@ export default function Edit({ id, onEdit }: PropsType) {
                     تایید
                 </Button>
             </ModalFooter>
+
+            
         </Form>
     );
 }

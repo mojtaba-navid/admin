@@ -1,4 +1,15 @@
 {
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx", // or "react" for older versions of React
+    "typeRoots": ["./node_modules/@types", "./src/types"],
+    "types": ["node"],
+    "skipLibCheck": true,
+    "moduleResolution": "node"
+  },
+
   "files": [],
   "references": [
     { "path": "./tsconfig.app.json" },

@@ -1,105 +1,95 @@
-// import { PATHS } from "./routes.config";
-import * as AiIcons from "react-icons/ai";
-import { HiOutlineClipboardList } from "react-icons/hi";
-import { SiBrandfolder } from "react-icons/si";
-import { BiCategory } from "react-icons/bi";
-import { FiType } from "react-icons/fi";
-import { FaFilter } from "react-icons/fa";
-import { VscSymbolProperty } from "react-icons/vsc";
-// import * as MdIcons from "react-icons/md";
-// import * as RiIcons from "react-icons/ri";
-// import * as IoIcons from 'react-icons/io'
 export const PATHS = {
   home: "/",
   login: "/login",
   register: "/register",
   createProduct: "/create-product",
-  orders: "/orders",
-  createProductCat: "/create-product-cat",
+  orders: "/order",
+  createProductCat: "/create-product-category",
   productTypes: "/product-types",
   brands: "/brands",
   filter: "/filter",
   property: "/property",
 };
+
 const items = [
   {
     name: "محصولات",
     label: "محصولات",
-    icon: <AiIcons.AiFillHome />,
+    icon: "mdi:home",
     path: PATHS.createProduct,
   },
 
   {
     name: "سفارش ها",
     label: "سفارش ها",
-    icon: <HiOutlineClipboardList />,
+    icon: "mdi:clipboard-list",
     path: PATHS.orders,
   },
 
   {
     name: "ایجاد دسته بندی",
     label: "ایجاد دسته بندی",
-    icon: <BiCategory />,
+    icon: "mdi:category",
     path: PATHS.createProductCat,
   },
 
   {
     name: "برندها",
     label: "برندها",
-    icon: <SiBrandfolder />,
+    icon: "mdi:briefcase-outline",
     path: PATHS.brands,
   },
 
   {
     name: "نوع محصول",
     label: "نوع محصول",
-    icon: <FiType />,
+    icon: "mdi:shape",
     path: PATHS.productTypes,
   },
 
-  {
-    name: "فیلترها",
-    label: "فیلترها",
-    icon: <FaFilter />,
-    path: PATHS.filter,
-  },
+  // {
+  //   name: "فیلترها",
+  //   label: "فیلترها",
+  //   icon: "mdi:filter-variant",
+  //   path: PATHS.filter,
+  // },
 
   {
     name: "ویژگی ها",
     label: "ویژگی ها",
-    icon: <VscSymbolProperty />,
+    icon: "mdi:format-list-bulleted",
     path: PATHS.property,
   },
 
   // {
   //   name: "setting",
   //   label: "Setting",
-  //   icon: <AiIcons.AiOutlineSetting />,
+  //   icon: <Icon icon="mdi:settings" />,
   // },
   // {
   //   name: "billing",
   //   label: "Billing",
-  //   icon: <MdIcons.MdOutlineAccountBalanceWallet />,
+  //   icon: <Icon icon="mdi:credit-card" />,
   // },
   // {
   //   name: "home",
   //   label: "Home",
-  //   icon: <RiIcons.RiBillLine />,
+  //   icon: <Icon icon="mdi:home" />,
   // },
   // {
   //   name: "home",
   //   label: "Home",
-  //   icon: <RiIcons.RiBillLine />,
+  //   icon: <Icon icon="mdi:home" />,
   //   items: [
   //     {
   //       name: "statements",
   //       label: "Statements",
-  //       icon: <RiIcons.RiBillLine />,
+  //       icon: <Icon icon="mdi:file-document" />,
   //     },
   //     {
   //       name: "reports",
   //       label: "Reports",
-  //       icon: <RiIcons.RiBillLine />,
+  //       icon: <Icon icon="mdi:file-chart" />,
   //     },
   //   ],
   // },

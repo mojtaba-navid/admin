@@ -4,7 +4,6 @@ import {
   BaseResponsePagination,
 } from "../../types/client/general";
 import { ProductType } from "../../types/productType.type";
-import { Property } from "../../types/property.type";
 import { endpoints } from "../../utils/end-points";
 import { fetchInstance } from "../../utils/fetch-instance";
 
@@ -34,32 +33,25 @@ export const AddProductType = async (
     method: "POST",
     body: data,
   }).catch((error) => {
-    console.error("Error adding brand:", error);
-    throw new Error("Failed to add brand. Please try again.");
+    throw new Error(error);
   });
 };
 
-export const editBrand = async (
+export const editProducType = async (
   id: number,
   data: AddProdcutTypeData
 ): Promise<BaseResponse<Brand>> => {
-  const url = replaceRouteParams(endpoints.type.editBrand, { id });
+  const url = replaceRouteParams(endpoints.type.getProductType, { id });
   return fetchInstance(url, {
     method: "PUT",
     body: data,
-  }).catch((error) => {
-    console.error("Error editing brand:", error);
-    throw new Error("Failed to edit brand. Please try again.");
   });
 };
 
-export const deleteBrand = async (id: number): Promise<void> => {
-  const url = replaceRouteParams(endpoints.type.deleteBrand, { id });
+export const deleteProductType = async (id: number): Promise<void> => {
+  const url = replaceRouteParams(endpoints.type.getProductType, { id });
   return fetchInstance(url, {
     method: "DELETE",
-  }).catch((error) => {
-    console.error("Error deleting brand:", error);
-    throw new Error("Failed to delete brand. Please try again.");
   });
 };
 
@@ -68,16 +60,13 @@ export const getProductTypes = async (
   pageSize = 10
 ): Promise<BaseResponsePagination<ProductType[]>> => {
   const url = `${endpoints.type.type}?page=${currentPage}&take=${pageSize}`;
-  return fetchInstance(url, { method: "GET" }).catch((error) => {
-    console.error("Error fetching brands:", error);
-    throw new Error("Failed to fetch brands. Please try again.");
-  });
+  return fetchInstance(url, { method: "GET" });
 };
 
-export const getBrand = async (id: number): Promise<BaseResponse<Brand>> => {
-  const url = replaceRouteParams(endpoints.type.getBrand, { id });
-  return fetchInstance(url, { method: "GET" }).catch((error) => {
-    console.error("Error fetching brand:", error);
-    throw new Error("Failed to fetch brand details. Please try again.");
-  });
+export const getProductType = async (
+  id: number
+): Promise<BaseResponse<ProductType>> => {
+  const url = replaceRouteParams(endpoints.type.getProductType, { id });
+  console.log(url);
+  return fetchInstance(url, { method: "GET" });
 };

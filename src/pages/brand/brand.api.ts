@@ -31,9 +31,6 @@ export const addBrand = async (
   return fetchInstance(endpoints.type.addBrand, {
     method: "POST",
     body: data,
-  }).catch((error) => {
-    console.error("Error adding brand:", error);
-    throw new Error("Failed to add brand. Please try again.");
   });
 };
 
@@ -45,9 +42,6 @@ export const editBrand = async (
   return fetchInstance(url, {
     method: "PUT",
     body: data,
-  }).catch((error) => {
-    console.error("Error editing brand:", error);
-    throw new Error("Failed to edit brand. Please try again.");
   });
 };
 
@@ -55,9 +49,6 @@ export const deleteBrand = async (id: number): Promise<void> => {
   const url = replaceRouteParams(endpoints.type.deleteBrand, { id });
   return fetchInstance(url, {
     method: "DELETE",
-  }).catch((error) => {
-    console.error("Error deleting brand:", error);
-    throw new Error("Failed to delete brand. Please try again.");
   });
 };
 
@@ -66,16 +57,10 @@ export const getBrands = async (
   pageSize = 10
 ): Promise<BaseResponsePagination<Brand[]>> => {
   const url = `${endpoints.type.getBrands}?page=${currentPage}&take=${pageSize}`;
-  return fetchInstance(url, { method: "GET" }).catch((error) => {
-    console.error("Error fetching brands:", error);
-    throw new Error("Failed to fetch brands. Please try again.");
-  });
+  return fetchInstance(url, { method: "GET" });
 };
 
 export const getBrand = async (id: number): Promise<BaseResponse<Brand>> => {
   const url = replaceRouteParams(endpoints.type.getBrand, { id });
-  return fetchInstance(url, { method: "GET" }).catch((error) => {
-    console.error("Error fetching brand:", error);
-    throw new Error("Failed to fetch brand details. Please try again.");
-  });
+  return fetchInstance(url, { method: "GET" });
 };

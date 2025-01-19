@@ -1,6 +1,6 @@
 
 
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 
 export default function InputLabel({ children }: { children: ReactNode }) {

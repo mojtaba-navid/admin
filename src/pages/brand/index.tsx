@@ -5,7 +5,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { addBrand, AddBrandData, deleteBrand, getBrands } from './brand.api';
-import { toast } from 'react-toastify';
 import { useEffect, useState } from 'react';
 import CustomDataGrid from '../../components/dataGrid';
 import { Brand } from '../../types/brand.type';
@@ -14,6 +13,8 @@ import { Icon } from '@iconify/react'
 import AddCollapse from '../../components/add-collapse';
 import Edit from './edit';
 import { BaseResponse } from '../../types/client/general';
+import toast from 'react-hot-toast';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 
 
@@ -29,7 +30,8 @@ export default function Brands() {
         queryKey: ["brands", currentPage],
         queryFn: () => getBrands(currentPage, pageSize),
     });
-    const { mutate } = useMutation<BaseResponse<Brand>, Error, AddBrandData>({
+
+    const { mutate, isPending } = useMutation<BaseResponse<Brand>, Error, AddBrandData>({
         mutationFn: addBrand,
         onSuccess: () => {
             toast.success("افزودن برند با موفقیت انجام شد", {
@@ -44,7 +46,7 @@ export default function Brands() {
         },
     });
 
-    const { mutate: deleteMutate } = useMutation<void, Error, number>({
+    const { mutate: deleteMutate, isPending: DeletePending } = useMutation<void, Error, number>({
         mutationFn: deleteBrand,
         onSuccess: () => {
             toast.success("حذف برند با موفقیت انجام شد", {
@@ -79,7 +81,7 @@ export default function Brands() {
     useEffect(() => {
         if (data) {
             setRows(data.data.data || []);
-            setTotalPageCount(data.meta?.pageCount || 1);
+            setTotalPageCount(data.data.meta?.pageCount || 1);
 
         }
     }, [data]);
@@ -108,7 +110,7 @@ export default function Brands() {
         resolver: zodResolver(schema),
     });
 
-    const { handleSubmit, formState: { isSubmitting } } = methods;
+    const { handleSubmit } = methods;
 
     const onSubmit = handleSubmit(async (formData) => {
         methods.reset();
@@ -136,7 +138,7 @@ export default function Brands() {
                             />
                         </div>
                         <div className="flex justify-end p-5">
-                            <Button variant="contained" type="submit" loading={isSubmitting}>
+                            <Button variant="contained" type="submit" loading={isPending}>
                                 تایید
                             </Button>
                         </div>
@@ -154,6 +156,16 @@ export default function Brands() {
                     loading={isFetching}
                 />
             </Card>
+
+            <Backdrop
+                open={DeletePending}
+                sx={{
+                    color: "#fff",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
             <Modal show={openEditModal}
                 title={'ویرایش'}
                 onClose={() => setOpenEditModal(false)}

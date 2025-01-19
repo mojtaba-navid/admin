@@ -1,4 +1,4 @@
-const BASE_URL = import.meta.env.VITE_BASE_URL + "api";
+export const BASE_URL = import.meta.env.VITE_BASE_URL + "api";
 const user = localStorage.getItem("user") || "{}";
 const token = JSON.parse(user)?.token;
 

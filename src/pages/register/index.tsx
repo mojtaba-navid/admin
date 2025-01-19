@@ -8,7 +8,7 @@ import { Form, Card, Button, TextFiled, InputLable } from '../../components';
 import { useMutation } from '@tanstack/react-query';
 import { register, RegisterData, RegisterResponse } from './register.api';
 import { CONFIRM_PASSWORD, EMAIL, lAST_NAME, NAME, NATIONAL_CODE } from './register.config';
-import { toast } from 'react-toastify';
+import toast from 'react-hot-toast';
 
 const PHONE_NUMBER = 'phoneNumber';
 const PASSWORD = 'password';

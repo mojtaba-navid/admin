@@ -1,15 +1,15 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Button, Form, ModalFooter, TextFiled } from "../../components";
 import { TITLE, TYPE } from "./product-type.config";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { AddBrandData, editBrand, getBrand } from "./prodcut-type.api";
+import { AddProdcutTypeData, editProducType, getProductType } from "./prodcut-type.api";
 import { Icon } from "@iconify/react";
-import { toast } from "react-toastify";
 import { BaseResponse } from "../../types/client/general";
 import { Brand } from "../../types/brand.type";
+import toast from "react-hot-toast";
 
 interface PropsType {
     id: number;
@@ -17,13 +17,13 @@ interface PropsType {
 }
 
 export default function Edit({ id, onEdit }: PropsType) {
-    const { data, isFetching, isError, refetch } = useQuery({
-        queryKey: ["brand", id],
-        queryFn: () => getBrand(id),
+    const { data, isFetching, isError } = useQuery({
+        queryKey: ["productType", id],
+        queryFn: () => getProductType(id),
     });
 
-    const { mutate } = useMutation<BaseResponse<Brand>, Error, { id: number; data: AddBrandData }>({
-        mutationFn: ({ id, data }) => editBrand(id, data),
+    const { mutate } = useMutation<BaseResponse<Brand>, Error, { id: number; data: AddProdcutTypeData }>({
+        mutationFn: ({ id, data }) => editProducType(id, data),
         onSuccess: () => {
             toast.success("ویرایش برند با موفقیت انجام شد", {
                 position: "bottom-left",
@@ -56,7 +56,7 @@ export default function Edit({ id, onEdit }: PropsType) {
     useEffect(() => {
         if (data?.data) {
             reset({
-                [TYPE]: data.data.brand || "",
+                [TYPE]: data.data.type || "",
                 [TITLE]: data.data.title || "",
             });
         }
@@ -82,11 +82,11 @@ export default function Edit({ id, onEdit }: PropsType) {
                     label="نام برند را به زبان فارسی وارد کنید"
                     name={TYPE}
                 />
-                <TextFiled
+                {/* <TextFiled
                     type="text"
                     label="نام برند به انگلیسی"
                     name={TITLE}
-                />
+                /> */}
             </div>
             <ModalFooter>
                 <Button variant="contained" type="submit" loading={isSubmitting}>

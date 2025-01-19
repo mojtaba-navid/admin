@@ -1,7 +1,7 @@
 
 
 import { Drawer } from '@mui/material'
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import MuiModal from '@mui/material/Modal';
 interface propsType {
     anchor?: "bottom" | "left" | "top" | "right" | undefined,
@@ -20,7 +20,6 @@ export default function Modal(props: propsType) {
     return (
         <>
             <MuiModal
-
                 open={show || false}
                 onClose={onClose}
                 aria-labelledby="modal-modal-title"

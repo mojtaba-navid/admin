@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";  // Corrected import for jwt-decode
 import { PATHS } from "../../config/routes.config";
@@ -9,13 +9,13 @@ interface DecodedToken {
 }
 
 interface PropsType {
-  component: React.ComponentType;
+  component: ReactNode;
   layout: {
     type: "private" | "auth"
   }
 }
 
-const Private = ({ component: Component, layout }: PropsType) => {
+const Private = ({ component, layout }: PropsType) => {
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const Private = ({ component: Component, layout }: PropsType) => {
 
   return (
     <AppLayout layoutItems={layout}>
-      <Component />
+      {component}
     </AppLayout>
   );
 };

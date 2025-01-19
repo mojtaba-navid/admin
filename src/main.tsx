@@ -7,7 +7,6 @@ import { prefixer } from 'stylis';
 import rtlPlugin from 'stylis-plugin-rtl';
 import App from './App';
 import './index.css'; // ایمپورت CSS در بالای همه
-
 // ایجاد کش برای RTL
 const cacheRtl = createCache({
   key: 'mui-rtl',

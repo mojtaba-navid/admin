@@ -1,5 +1,5 @@
 
-import React, { ReactNode } from 'react'
+import  { ReactNode } from 'react'
 
 export default function ModalFooter({ children, className }: { children: ReactNode, className?: string }) {
     return (

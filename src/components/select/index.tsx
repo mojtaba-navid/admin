@@ -1,50 +1,53 @@
-import type { SelectProps } from '@mui/material/Select';
-import { Controller, useFormContext } from 'react-hook-form';
-import Select from '@mui/material/Select';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import FormHelperText from '@mui/material/FormHelperText';
+import { Controller, useFormContext } from "react-hook-form";
+import ReactSelect from "react-select";
 
-type Props = SelectProps & {
+type Props = {
     name: string;
-    label: string;
-    options: { value: string | number; label: string }[];
+    label?: string;
+    options: { value: string; label: string }[];
     helperText?: string;
+    isSearchable?: boolean;
 };
 
-const RHFSelect = ({ name, label, options, helperText, ...other }: Props) => {
+const RHFSingleSelect = ({ name, label, options, helperText, isSearchable = true }: Props) => {
     const { control } = useFormContext();
 
     return (
-        <FormControl fullWidth size="small" error={!!helperText}>
-            <InputLabel>{label}</InputLabel>
+        <div style={{ marginBottom: "1rem" }}>
+            {label && (
+                <label className="pr-2">
+                    {label}
+                </label>
+            )}
             <Controller
                 name={name}
                 control={control}
-                render={({ field: { onChange, onBlur, value, ref }, fieldState: { error } }) => (
+
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
                     <>
-                        <Select
-                            {...other}
-                            value={value || ''}
-                            onChange={onChange}
-                            onBlur={onBlur}
-                            inputRef={ref}
-                            label={label}
-                        >
-                            {options.map((option) => (
-                                <MenuItem key={option.value} value={option.value}>
-                                    {option.label}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                        {helperText && <FormHelperText>{helperText}</FormHelperText>}
-                        {error && <FormHelperText>{error.message}</FormHelperText>}
+                        <ReactSelect
+                            className=" border-red-50 border"
+                            isSearchable={isSearchable} // فعال کردن قابلیت جستجو
+                            options={options}
+                            value={options.find((option) => option.value === value) || null} // مقدار انتخاب‌شده
+                            onChange={(selected) => onChange((selected as any)?.value || "")} // مقدار انتخاب‌شده
+                            placeholder={''}
+                        />
+                        {helperText && !error && (
+                            <small style={{ color: "#6c757d", marginTop: "0.25rem", display: "block" }}>
+                                {helperText}
+                            </small>
+                        )}
+                        {error && (
+                            <small style={{ color: "red", marginTop: "0.25rem", display: "block" }}>
+                                {error.message}
+                            </small>
+                        )}
                     </>
                 )}
             />
-        </FormControl>
+        </div>
     );
 };
 
-export default RHFSelect;
+export default RHFSingleSelect;

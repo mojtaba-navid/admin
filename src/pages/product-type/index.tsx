@@ -4,8 +4,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { AddProdcutTypeData, AddProductType, deleteBrand, getProductTypes } from './prodcut-type.api';
-import { toast } from 'react-toastify';
+import { AddProdcutTypeData, AddProductType, deleteProductType, getProductTypes } from './prodcut-type.api';
 import { useEffect, useState } from 'react';
 import CustomDataGrid from '../../components/dataGrid';
 import { GridColDef } from '@mui/x-data-grid';
@@ -14,6 +13,8 @@ import AddCollapse from '../../components/add-collapse';
 import Edit from './edit';
 import { BaseResponse } from '../../types/client/general';
 import { ProductType } from '../../types/productType.type';
+import toast from 'react-hot-toast';
+import { Backdrop, CircularProgress } from '@mui/material';
 
 export default function productTypes() {
     const [openEditModal, setOpenEditModal] = useState<boolean>(false)
@@ -24,14 +25,13 @@ export default function productTypes() {
     const pageSize = 10;
 
     const { data, isFetching, refetch } = useQuery({
-        queryKey: ["brands", currentPage],
+        queryKey: ["productTypes", currentPage],
         queryFn: () => getProductTypes(currentPage, pageSize),
     });
-    console.log('data', data)
-    const { mutate } = useMutation<BaseResponse<ProductType>, Error, AddProdcutTypeData>({
+    const { mutate, isPending } = useMutation<BaseResponse<ProductType>, Error, AddProdcutTypeData>({
         mutationFn: AddProductType,
         onSuccess: () => {
-            toast.success("افزودن نوع محصول با موفقیت انجام شد", {
+            toast.success("افزودن ویژگی با موفقیت انجام شد", {
                 position: 'bottom-left',
             });
             refetch()
@@ -43,8 +43,8 @@ export default function productTypes() {
         },
     });
 
-    const { mutate: deleteMutate } = useMutation<void, Error, number>({
-        mutationFn: deleteBrand,
+    const { mutate: deleteMutate, isPending: isPendingDelete } = useMutation<void, Error, number>({
+        mutationFn: deleteProductType,
         onSuccess: () => {
             toast.success("حذف برند با موفقیت انجام شد", {
                 position: 'bottom-left',
@@ -78,7 +78,7 @@ export default function productTypes() {
     useEffect(() => {
         if (data) {
             setRows(data.data.data || []);
-            setTotalPageCount(data.meta?.pageCount || 1);
+            setTotalPageCount(data.data.meta?.pageCount || 1);
 
         }
     }, [data]);
@@ -107,7 +107,7 @@ export default function productTypes() {
         resolver: zodResolver(schema),
     });
 
-    const { handleSubmit, formState: { isSubmitting } } = methods;
+    const { handleSubmit } = methods;
 
     const onSubmit = handleSubmit(async (formData) => {
         methods.reset();
@@ -134,7 +134,7 @@ export default function productTypes() {
                             />
                         </div>
                         <div className="flex justify-end p-5">
-                            <Button variant="contained" type="submit" loading={isSubmitting}>
+                            <Button variant="contained" type="submit" loading={isPending}>
                                 تایید
                             </Button>
                         </div>
@@ -155,7 +155,18 @@ export default function productTypes() {
             <Modal show={openEditModal}
                 title={'ویرایش'}
                 onClose={() => setOpenEditModal(false)}
-                modalContent={<Edit id={id} onEdit={() => { refetch() }} />} sheetContent={<Edit id={id} onEdit={() => { refetch() }} />} />
+                modalContent={<Edit id={id} onEdit={() => { setOpenEditModal(false); refetch() }} />} sheetContent={<Edit id={id} onEdit={() => { refetch(); setOpenEditModal(false) }} />}
+            />
+
+            <Backdrop
+                open={isPendingDelete}
+                sx={{
+                    color: "#fff",
+                    zIndex: (theme) => theme.zIndex.drawer + 1,
+                }}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
         </ >
     );
 }
